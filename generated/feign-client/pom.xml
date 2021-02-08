@@ -10,6 +10,9 @@
   <artifactId>gs-openapi-generated-feign-client</artifactId>
   <packaging>jar</packaging>
   <name>GeoServer OpenAPI generated Feign client</name>
+  <properties>
+    <openapi-base-folder>${project.parent.parent.basedir}/openapi/1.0.0</openapi-base-folder>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.geoserver.openapi</groupId>
