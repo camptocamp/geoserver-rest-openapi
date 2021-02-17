@@ -19,6 +19,7 @@ import feign.codec.StringDecoder;
 import feign.form.FormEncoder;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import feign.okhttp.OkHttpClient;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -135,6 +136,8 @@ public class GeoServerClient {
         objectMapper.setSerializationInclusion(Include.NON_EMPTY);
         Builder feignBuilder = apiClient.getFeignBuilder();
         feignBuilder.errorDecoder(new GeoServerFeignErrorDecoder());
+        // use okhttp client, the default one doesn't send request headers correctly
+        feignBuilder.client(new OkHttpClient());
 
         Decoder decoder =
                 new Decoder() {
@@ -224,10 +227,10 @@ public class GeoServerClient {
                     private final Map<String, String> headers = new HashMap<>(authHeaders);
 
                     public @Override void apply(RequestTemplate template) {
-                        headers.forEach(
-                                (name, value) -> {
-                                    template.header(name, value);
-                                });
+                        for (String name : headers.keySet()) {
+                            String value = headers.get(name);
+                            template.header(name, value);
+                        }
                     }
                 };
         apiClient.getApiAuthorizations().remove("basicAuth");
