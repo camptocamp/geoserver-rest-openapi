@@ -8,6 +8,7 @@ import feign.Feign.Builder;
 import feign.FeignException;
 import feign.Logger.Level;
 import feign.Request.Body;
+import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import feign.Response;
 import feign.codec.DecodeException;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -126,7 +128,6 @@ public class GeoServerClient {
 
     public GeoServerClient(@NonNull String restApiEntryPoint) {
         apiClient = new ApiClient();
-        apiClient.addAuthorization("basicAuth", new HttpBasicAuth());
         setBasePath(restApiEntryPoint);
         final ObjectMapper objectMapper = apiClient.getObjectMapper();
         // do not serialize null or empty collections. This is important for GeoServer
@@ -209,7 +210,28 @@ public class GeoServerClient {
     }
 
     public GeoServerClient setBasicAuth(@NonNull String userName, @NonNull String password) {
+        if (!apiClient.getApiAuthorizations().containsKey("basicAuth")) {
+            apiClient.addAuthorization("basicAuth", new HttpBasicAuth());
+        }
         apiClient.setCredentials(userName, password);
+        return this;
+    }
+
+    public GeoServerClient setRequestHeaderAuth(
+            @NonNull String authName, @NonNull Map<String, String> authHeaders) {
+        RequestInterceptor interceptor =
+                new RequestInterceptor() {
+                    private final Map<String, String> headers = new HashMap<>(authHeaders);
+
+                    public @Override void apply(RequestTemplate template) {
+                        headers.forEach(
+                                (name, value) -> {
+                                    template.header(name, value);
+                                });
+                    }
+                };
+        apiClient.getApiAuthorizations().remove("basicAuth");
+        apiClient.addAuthorization(authName, interceptor);
         return this;
     }
 
