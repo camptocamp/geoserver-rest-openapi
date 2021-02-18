@@ -2,6 +2,7 @@
 	"generatorName": "java",
 	"modelPackage": "org.geoserver.openapi.model.config",
 	"apiPackage" : "org.geoserver.openapi.model.config",
+	"hideGenerationTimestamp": "true",
 	"addCompileSourceRoot": "true",
 	"validateSpec": "true",
 	"sourceFolder" : "src",

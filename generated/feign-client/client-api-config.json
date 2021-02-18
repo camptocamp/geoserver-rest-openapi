@@ -3,6 +3,7 @@
 	"modelPackage": "org.geoserver.openapi.v1.model",
 	"apiPackage" : "org.geoserver.openapi.v1.client",
 	"invokerPackage" : "org.geoserver.openapi.client.internal",
+	"hideGenerationTimestamp": "true",
 	"addCompileSourceRoot": "true",
 	"generateModels": "true",
 	"generateApis": "true",
